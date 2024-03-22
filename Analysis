@@ -1,0 +1,859 @@
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt 
+import seaborn as sns
+# To Ignore Warnings 
+import warnings 
+warnings.filterwarnings('ignore')
+
+ds = pd.read_csv("C:/Users/Sinsi/Desktop/Employee_DS/WA_Fn-UseC_-HR-Employee-Attrition.csv")
+
+ds.head
+
+ds.tail()
+
+ds.columns
+
+ds.dtypes
+
+ds.isnull().sum()
+
+ds.describe()
+
+ds.describe(include='object')
+
+cat_cols=ds.select_dtypes(include=['object']).columns
+num_cols = ds.select_dtypes(include=np.number).columns.tolist()
+print("Categorical Variables:")
+print(cat_cols)
+print("Numerical Variables:")
+print(num_cols)
+
+for col in num_cols:
+    print(col)
+    print('Skew :', round(ds[col].skew(), 2))
+    plt.figure(figsize = (15, 4))
+    plt.subplot(1, 2, 1)
+    ds[col].hist(grid=False)
+    plt.ylabel('count')
+    plt.subplot(1, 2, 2)
+    sns.boxplot(x=ds[col])
+    plt.show()
+
+ds['Age'].median()
+
+min_age = ds['Age'].min()
+max_age = ds['Age'].max()
+
+print("Minimum Age:", min_age)
+print("Maximum Age:", max_age)
+
+# Calculate quartiles
+Q1 = ds['Age'].quantile(0.25)
+Q3 = ds['Age'].quantile(0.75)
+
+print("IQR Min:", Q1)
+print("IQR Max:", Q3)
+
+ds['PerformanceSatisfactionIndex'] = ds[['EnvironmentSatisfaction', 'JobSatisfaction', 'RelationshipSatisfaction']].mean(axis=1)
+
+ds['ExperiencePriorToCurrentJob'] = ds['TotalWorkingYears'] - ds['YearsAtCompany']
+
+ds['EmployeeEngagementScore'] = (ds['JobInvolvement'] + ds['PerformanceRating'] + ds['WorkLifeBalance']) / 3
+
+environment_satisfaction_map = {
+    1: 'Low',
+    2: 'Medium',
+    3: 'High',
+    4: 'Very High'
+}
+
+job_involvement_map = {
+    1: 'Low',
+    2: 'Medium',
+    3: 'High',
+    4: 'Very High'
+}
+
+job_satisfaction_map = {
+    1: 'Low',
+    2: 'Medium',
+    3: 'High',
+    4: 'Very High'
+}
+
+performance_rating_map = {
+    1: 'Low',
+    2: 'Good',
+    3: 'Excellent',
+    4: 'Outstanding'
+}
+
+
+relationship_satisfaction_map = {
+    1: 'Low',
+    2: 'Medium',
+    3: 'High',
+    4: 'Very High'
+}
+
+
+work_life_balance_map = {
+    1: 'Bad',
+    2: 'Good',
+    3: 'Better',
+    4: 'Best'
+}
+
+ds['Education'] = ds['Education'].map(education_map)
+ds['EnvironmentSatisfaction'] = ds['EnvironmentSatisfaction'].map(environment_satisfaction_map)
+ds['JobInvolvement'] = ds['JobInvolvement'].map(job_involvement_map)
+ds['JobSatisfaction'] = ds['JobSatisfaction'].map(job_satisfaction_map)
+ds['PerformanceRating'] = ds['PerformanceRating'].map(performance_rating_map)
+ds['RelationshipSatisfaction'] = ds['RelationshipSatisfaction'].map(relationship_satisfaction_map)
+ds['WorkLifeBalance'] = ds['WorkLifeBalance'].map(work_life_balance_map)
+ds['Overtime_Preference'] = ds['OverTime'].map({'Yes': 1, 'No': 0})
+
+#https://www.beresfordresearch.com/age-range-by-generation/
+def generation(age):
+    if (age >= 97) & (age <= 102):
+        return 'WWII'
+    elif (age >= 79) & (age <= 96):
+        return 'Post War'
+    elif (age >= 70) & (age <= 78):
+        return 'Boomers I*'
+    elif (age >= 60) & (age <= 69):
+        return 'Boomers II (a/k/a Generation Jones)*'
+    elif (age >= 44) & (age <= 59):
+        return 'Gen X'
+    elif (age >= 28 ) & (age <= 43):
+        return 'Millennials'
+    elif (age >= 12 ) & (age <= 27):
+        return 'Gen Z'
+
+def distance_category(distance):
+    if (distance >= 1) & (distance <= 10):
+        return 'Short Distance'
+    elif (distance >= 11) & (distance <= 20):
+        return 'Medium Distance'
+    elif (distance >= 21) & (distance <= 30):
+        return 'Long Distance'
+
+ds['AgeGeneration'] = ds['Age'].apply(generation)
+ds['DistanceFromHomeCategory'] = ds['DistanceFromHome'].apply(distance_category)
+
+ds = ds.reindex(sorted(ds.columns), axis=1)
+
+ds.columns
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='Age', bins=20, kde=False, edgecolor='black')
+plt.title('Distribution of Age')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='Age')
+plt.title('Box Plot of Age Distribution')
+plt.xlabel('Age')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.kdeplot(data=ds, x='Age',fill=True)
+plt.title('KDE Plot of Age Distribution')
+plt.xlabel('Age')
+plt.ylabel('Density')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='Attrition')
+
+# Adding annotations
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+
+plt.title('Count Plot of Attrition')
+plt.xlabel('Attrition')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='BusinessTravel')
+plt.title('Count Plot of Business Travel')
+plt.xlabel('Business Travel')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(ds['DailyRate'], bins=20, kde=True,)
+plt.title('Histogram of Daily Rate')
+plt.xlabel('Daily Rate')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, y='DailyRate')
+plt.title('Box Plot of Daily Rate')
+plt.ylabel('Daily Rate')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='Department')
+plt.title('Count Plot of Department')
+plt.xlabel('Department')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='DistanceFromHome', bins=20, kde=False,)
+plt.title('Histogram of Distance from Home')
+plt.xlabel('Distance from Home')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, y='DistanceFromHome')
+plt.title('Box Plot of Distance from Home')
+plt.ylabel('Distance from Home')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+ax = sns.countplot(data=ds, x='EducationField')
+plt.title('Count Plot of Education Field')
+plt.xlabel('Education Field')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='EmployeeEngagementScore', bins=6, kde=True)
+plt.title('Histogram of Employee Engagement Score')
+plt.xlabel('Employee Engagement Score')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='EmployeeEngagementScore')
+plt.title('Box Plot of Employee Engagement Score')
+plt.xlabel('Employee Engagement Score')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(ds=ds, x='EnvironmentSatisfaction', palette='Set1', order=['Low', 'Medium', 'High', 'Very High'])
+plt.title('Count Plot of Environment Satisfaction')
+plt.xlabel('Environment Satisfaction')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(ds['ExperiencePriorToCurrentJob'], bins=20, kde=True)
+plt.title('Distribution of Experience Prior to Current Job')
+plt.xlabel('Years of Experience')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, y='ExperiencePriorToCurrentJob')
+plt.title('Box Plot of Experience Prior to Current Job')
+plt.ylabel('Years of Experience')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='Gender')
+plt.title('Count Plot of Gender')
+plt.xlabel('Gender')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='HourlyRate', bins=20, kde=True)
+plt.title('Histogram of Hourly Rates')
+plt.xlabel('Hourly Rate')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, y='HourlyRate')
+plt.title('Box Plot of Hourly Rates')
+plt.ylabel('Hourly Rate')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.rugplot(data=ds, x='HourlyRate', height=0.5)
+plt.title('Rug Plot of Hourly Rates')
+plt.xlabel('Hourly Rate')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(ds=ds, x='JobInvolvement', palette='Set1', order=['Low', 'Medium', 'High', 'Very High'])
+plt.title('Count Plot of Job Involvement')
+plt.xlabel('Job Involvement')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='JobLevel')
+plt.title('Count Plot of Job Level')
+plt.xlabel('Job Level')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(12, 6))
+ax = sns.countplot(data=ds, y='JobRole')
+plt.title('Count Plot of Job Roles')
+plt.xlabel('Frequency')
+plt.ylabel('Job Role')
+
+for p in ax.patches:
+    ax.annotate(f'{p.get_width()}', (p.get_width(), p.get_y() + p.get_height() / 2.),
+                ha='center', va='center', fontsize=10, color='black', xytext=(5, 0),
+                textcoords='offset points')
+
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(ds=ds, x='JobSatisfaction', order=['Low', 'Medium', 'High', 'Very High'])
+plt.title('Count Plot of Job Satisfaction')
+plt.xlabel('Job Satisfaction')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='MaritalStatus')
+plt.title('Count Plot of Marital Status')
+plt.xlabel('Marital Status')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.histplot(ds['MonthlyIncome'], bins=20, kde=True,)
+plt.title('Histogram of Monthly Income')
+plt.xlabel('Monthly Income')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='MonthlyIncome')
+plt.title('Box Plot of Monthly Income')
+plt.xlabel('Monthly Income')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.histplot(ds['MonthlyRate'], bins=20, kde=True)
+plt.title('Histogram of Monthly Rate')
+plt.xlabel('Monthly Rate')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='MonthlyRate')
+plt.title('Box Plot of Monthly Rate')
+plt.xlabel('Monthly Rate')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.histplot(ds['NumCompaniesWorked'], bins=10, kde=True)
+plt.title('Histogram of Number of Companies Worked')
+plt.xlabel('Number of Companies Worked')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='NumCompaniesWorked')
+plt.title('Box Plot of Number of Companies Worked')
+plt.xlabel('Number of Companies Worked')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.countplot(data=ds, x='Over18')
+plt.title('Count Plot of Over 18')
+plt.xlabel('Over 18')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='OverTime')
+plt.title('Count Plot of Overtime Preference')
+plt.xlabel('Overtime Preference')
+plt.ylabel('Frequency')
+plt.xticks(rotation=45)
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.histplot(data=ds, x='PercentSalaryHike', bins=15, kde=True)
+plt.title('Histogram of Percent Salary Hike')
+plt.xlabel('Percent Salary Hike')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='PercentSalaryHike')
+plt.title('Box Plot of Percent Salary Hike')
+plt.xlabel('Percent Salary Hike')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='PerformanceRating')
+plt.title('Count Plot of Performance Rating')
+plt.xlabel('Performance Rating')
+plt.ylabel('Frequency')
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='PerformanceSatisfactionIndex', bins=10, kde=True)
+plt.title('Histogram of Performance Satisfaction Index')
+plt.xlabel('Performance Satisfaction Index')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, y='PerformanceSatisfactionIndex')
+plt.title('Box Plot of Performance Satisfaction Index')
+plt.ylabel('Performance Satisfaction Index')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(ds=ds, x='RelationshipSatisfaction', order=['Low', 'Medium', 'High', 'Very High'])
+plt.title('Count Plot of Relationship Satisfaction')
+plt.xlabel('Relationship Satisfaction')
+plt.ylabel('Frequency')
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.countplot(data=ds, x='StandardHours')
+plt.title('Count Plot of Standard Hours')
+plt.xlabel('Standard Hours')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='StockOptionLevel', palette='Set3')
+plt.title('Count Plot of Stock Option Level')
+plt.xlabel('Stock Option Level')
+plt.ylabel('Frequency')
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='TotalWorkingYears')
+plt.title('Box Plot of Total Working Years')
+plt.xlabel('Total Working Years')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='TrainingTimesLastYear', bins=7, kde=True)
+plt.title('Histogram of Training Times Last Year')
+plt.xlabel('Training Times Last Year')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='TrainingTimesLastYear')
+plt.title('Box Plot of Training Times Last Year')
+plt.xlabel('Training Times Last Year')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+ax = sns.countplot(data=ds, x='WorkLifeBalance', palette='Set2')
+plt.title('Bar Plot of Work-Life Balance')
+plt.xlabel('Work-Life Balance')
+plt.ylabel('Frequency')
+for p in ax.patches:
+    ax.annotate(f'{p.get_height()}', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                textcoords='offset points')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='YearsAtCompany', bins=20, kde=True)
+plt.title('Histogram of Years at Company')
+plt.xlabel('Years at Company')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='YearsAtCompany')
+plt.title('Box Plot of Years at Company')
+plt.xlabel('Years at Company')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='YearsInCurrentRole', bins=19, kde=True)
+plt.title('Histogram of Years in Current Role')
+plt.xlabel('Years in Current Role')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='YearsInCurrentRole')
+plt.title('Box Plot of Years in Current Role')
+plt.xlabel('Years in Current Role')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='YearsSinceLastPromotion', bins=16, kde=True)
+plt.title('Histogram of Years Since Last Promotion')
+plt.xlabel('Years Since Last Promotion')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='YearsSinceLastPromotion')
+plt.title('Box Plot of Years Since Last Promotion')
+plt.xlabel('Years Since Last Promotion')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.histplot(data=ds, x='YearsWithCurrManager', bins=18, kde=True)
+plt.title('Histogram of Years With Current Manager')
+plt.xlabel('Years With Current Manager')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=ds, x='YearsWithCurrManager')
+plt.title('Box Plot of Years With Current Manager')
+plt.xlabel('Years With Current Manager')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(x='Attrition', y='Age', data=ds)
+plt.title('Attrition vs. Age')
+plt.xlabel('Attrition')
+plt.ylabel('Age')
+plt.show()
+
+sns.boxplot(data=ds, x='Department', y='Age')
+plt.title('Age vs. Department')
+plt.xlabel('Department')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=ds, y='MonthlyIncome', x='Age')
+plt.title('Age vs. Monthly Income')
+plt.xlabel('Monthly Income')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='JobLevel', y='Age')
+plt.title('Age vs. Job Level')
+plt.xlabel('Job Level')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=ds, x='YearsAtCompany', y='Age')
+plt.title('Age vs. Years at Company')
+plt.xlabel('Years at Company')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='PerformanceRating', y='Age')
+plt.title('Age vs. Performance Rating')
+plt.xlabel('Performance Rating')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='JobSatisfaction', y='Age')
+plt.title('Age vs. Job Satisfaction')
+plt.xlabel('Job Satisfaction')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='Education', y='Age')
+plt.title('Age vs. Education')
+plt.xlabel('Education')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='EnvironmentSatisfaction', y='Age')
+plt.title('Age vs. Environment Satisfaction')
+plt.xlabel('Environment Satisfaction')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='RelationshipSatisfaction', y='Age')
+plt.title('Age vs. Relationship Satisfaction')
+plt.xlabel('Relationship Satisfaction')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(data=ds, x='AgeGeneration', hue='Attrition', palette='Set1')
+plt.title('Attrition by Age Generation')
+plt.xlabel('Age Generation')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Attrition', loc='upper right')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(data=ds, x='AgeGeneration', hue='Department', palette='Set2')
+plt.title('Department Distribution by Age Generation')
+plt.xlabel('Age Generation')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Department', loc='upper right')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='AgeGeneration', y='MonthlyIncome', palette='viridis')
+plt.title('Monthly Income by Age Generation')
+plt.xlabel('Age Generation')
+plt.ylabel('Monthly Income')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='AgeGeneration', y='JobLevel', palette='muted')
+plt.title('Job Level by Age Generation')
+plt.xlabel('Age Generation')
+plt.ylabel('Job Level')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='AgeGeneration', y='YearsAtCompany', palette='Set3')
+plt.title('Years at Company by Age Generation')
+plt.xlabel('Age Generation')
+plt.ylabel('Years at Company')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(data=ds, x='Attrition', hue='BusinessTravel', palette='Set1')
+plt.title('Attrition by Business Travel')
+plt.xlabel('Attrition')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Business Travel', loc='upper right')
+plt.show()
+
+### Attrition vs. Department 
+
+plt.figure(figsize=(10, 6))
+sns.countplot(data=ds, x='Attrition', hue='Department', palette='Set2')
+plt.title('Attrition by Department')
+plt.xlabel('Attrition')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Department', loc='upper right')
+plt.show()
+
+### Attrition vs. Income
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='Attrition', y='MonthlyIncome', palette='viridis')
+plt.title('Monthly Income by Attrition')
+plt.xlabel('Attrition')
+plt.ylabel('Monthly Income')
+plt.show()
+
+### Attrition vs. Job Level 
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='Attrition', y='JobLevel', palette='muted')
+plt.title('Job Level by Attrition')
+plt.xlabel('Attrition')
+plt.ylabel('Job Level')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='Attrition', y='Age', palette='Set1')
+plt.title('Age Distribution by Attrition')
+plt.xlabel('Attrition')
+plt.ylabel('Age')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(data=ds, x='Attrition', hue='AgeGeneration', palette='Set2')
+plt.title('Attrition by Age Generation')
+plt.xlabel('Attrition')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Age Generation', loc='upper right')
+plt.show()
+
+plt.figure(figsize=(6, 4))
+sns.countplot(x='Attrition', hue='Gender', data=ds, palette='Set1')
+plt.title('Attrition by Gender')
+plt.xlabel('Attrition')
+plt.ylabel('Count')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(data=ds, x='Attrition', hue='BusinessTravel', palette='viridis')
+plt.title('Attrition by Business Travel')
+plt.xlabel('Attrition')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Business Travel', loc='upper right')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='Attrition', y='DailyRate', palette='muted')
+plt.title('Daily Rate by Attrition')
+plt.xlabel('Attrition')
+plt.ylabel('Daily Rate')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.countplot(data=ds, x='Attrition', hue='Department', palette='Set3')
+plt.title('Attrition by Department')
+plt.xlabel('Attrition')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Department', loc='upper right')
+plt.show()
+
+ct = pd.crosstab(ds['BusinessTravel'], ds['Attrition'])
+ct.plot(kind='bar', stacked=True, figsize=(10, 6))
+plt.title('Stacked Bar Plot of Attrition by Business Travel')
+plt.xlabel('Business Travel')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.legend(title='Attrition')
+plt.show()
+
+sns.pairplot(data=ds, vars=['DailyRate', 'Age', 'MonthlyIncome'], hue='Attrition', palette='Set1')
+plt.title('Pair Plot of Daily Rate, Age, and Monthly Income with Attrition')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='Department', y='DailyRate', hue='Attrition', palette='Set1')
+plt.title('Box Plot of Daily Rate by Department with Attrition')
+plt.xlabel('Department')
+plt.ylabel('Daily Rate')
+plt.legend(title='Attrition')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='DistanceFromHomeCategory', y='MonthlyIncome', hue='Attrition', palette='Set2')
+plt.title('Box Plot of Monthly Income by Distance From Home with Attrition')
+plt.xlabel('Distance From Home Category')
+plt.ylabel('Monthly Income')
+plt.legend(title='Attrition')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='DistanceFromHomeCategory', y='MonthlyIncome', hue='Attrition', palette='Set2')
+plt.title('Box Plot of Monthly Income by Distance From Home with Attrition')
+plt.xlabel('Distance From Home Category')
+plt.ylabel('Monthly Income')
+plt.legend(title='Attrition')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='Education', y='MonthlyIncome', hue='Attrition', palette='Set3')
+plt.title('Box Plot of Monthly Income by Education Level with Attrition')
+plt.xlabel('Education Level')
+plt.ylabel('Monthly Income')
+plt.legend(title='Attrition')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.barplot(data=ds, x='Education', y='MonthlyIncome', hue='Attrition', palette='Set3', ci=None)
+plt.title('Bar Plot of Monthly Income by Education Level with Attrition')
+plt.xlabel('Education Level')
+plt.ylabel('Monthly Income')
+plt.legend(title='Attrition')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='EducationField', y='MonthlyIncome', hue='Attrition', palette='Set3')
+plt.title('Box Plot of Monthly Income by Education Field with Attrition')
+plt.xlabel('Education Field')
+plt.ylabel('Monthly Income')
+plt.legend(title='Attrition')
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=ds, x='EnvironmentSatisfaction', y='MonthlyIncome', hue='Attrition', palette='Set3')
+plt.title('Box Plot of Monthly Income by Environment Satisfaction with Attrition')
+plt.xlabel('Environment Satisfaction')
+plt.ylabel('Monthly Income')
+plt.legend(title='Attrition')
+plt.xticks(rotation=45)
+plt.show()
