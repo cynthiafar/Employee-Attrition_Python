@@ -44,12 +44,18 @@ The entire code for the following project can be found here:
 ## Further Research
 Further research should investigate how gender is playing a role in attrition. I was interested to see that Males were more likely to quit verses females. In industry organizational psychology we learned about the gender gap and how females are more likely to quit because of job burnout and family conflicts. I am curious to see if times have changed and women are now staying in the workforce longer. 
 
+## DISCLAMER
+Due to company confidentiality, this data set is fictitious and is used only for the purposes of displaying the knowledge I contain along with the different skills I possess as a Data Scientist. 
+
 
 ## Helpful Tutorials
+
 Visualizing Data in Python with Seaborn 
+
 Visualizing Data in Python with Seaborn – Real Python
 Python Overview 
 https://www.python.org/doc/
+
 Step by Step EDA with Python 
 https://www.analyticsvidhya.com/blog/2022/07/step-by-step-exploratory-data-analysis-eda-using-python/
 
@@ -79,6 +85,3 @@ https://www.geeksforgeeks.org/data-visualization-in-jupyter-notebook/
 
 Adding a file to a repository on GitHub
 https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository
-
-## DISCLAMER
-Due to company confidentiality, this data set is fictitious and is used only for the purposes of displaying the knowledge I contain along with the different skills I possess as a Data Scientist. 
