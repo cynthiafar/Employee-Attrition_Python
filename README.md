@@ -13,14 +13,14 @@ The purpose of this analysis is to investigate the following:
 -	Monthly Income and distance from home have an effect on Attrition?
   
 ## Tools
-•	Visual Studio Code (VSC) 
-•	Git 
-•	GitHub
-•	Python
-•	Anaconda
-•	Matplotlib
-•	Numpy
-•	Seaborn
+-	Visual Studio Code (VSC) 
+-	Git 
+-	GitHub
+-	Python
+-	Anaconda
+-	Matplotlib
+-	Numpy
+-	Seaborn
 
 ## Analysis
 
