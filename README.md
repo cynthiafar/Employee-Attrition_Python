@@ -50,10 +50,7 @@ Due to company confidentiality, this data set is fictitious and is used only for
 
 ## Helpful Tutorials
 
-Visualizing Data in Python with Seaborn 
-
-Visualizing Data in Python with Seaborn – Real Python
-Python Overview 
+Visualizing Data in Python Python Overview 
 https://www.python.org/doc/
 
 Step by Step EDA with Python 
@@ -65,23 +62,15 @@ https://www.geeksforgeeks.org/exploratory-data-analysis-in-python/
 
 EDA in Python 
 https://towardsdatascience.com/exploratory-data-analysis-in-python-a-step-by-step-process-d0dfa6bf94ee
+
 EDA with Panda
 https://github.com/AlexTheAnalyst/PandasYouTubeSeries/blob/main/Pandas%20101%20-%20Exploratory%20Data%20Analysis%20in%20Pandas.ipynb
 
 Kaggle HR Data Analysis 
 https://www.kaggle.com/code/chzzbeer/hr-data-analysis#Download-libraries/packages
 
-Seaborn GitHub
-GitHub - mwaskom/seaborn: Statistical data visualization in Python
-
 Matplotlib 
 https://matplotlib.org/
 
 Age Range by Generation 
 https://www.beresfordresearch.com/age-range-by-generation/
-
-Data Visualization in Jupyter Notebook 
-https://www.geeksforgeeks.org/data-visualization-in-jupyter-notebook/
-
-Adding a file to a repository on GitHub
-https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository
